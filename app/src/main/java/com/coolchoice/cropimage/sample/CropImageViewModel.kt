@@ -11,6 +11,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.coolchoice.cropimage.OUTPUT_BITMAP_RESOLUTION
 import com.coolchoice.cropimage.TAG
 import com.coolchoice.cropimage.utils.ImageUtils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,7 +60,7 @@ class CropImageViewModel constructor() : ViewModel() {
     fun cropBitmapImage(bitmap: Bitmap, cropArea: Rect, virtualImageCoordinates: Rect) {
         viewModelScope.launch {
             try {
-                val output = ImageUtils.cropBitmapImage(bitmap, cropArea, virtualImageCoordinates)
+                val output = ImageUtils.cropBitmapImage(bitmap, cropArea, virtualImageCoordinates, OUTPUT_BITMAP_RESOLUTION)
                 _croppedImageEvent.value = Event(output)
                 if (BuildConfig.DEBUG) {
                     _testCroppedImage.value = output

@@ -143,7 +143,12 @@ object ImageUtils {
     }
 
 
-    suspend fun cropBitmapImage(bitmap: Bitmap, cropArea: Rect, virtualImageCoordinates: Rect): Bitmap {
+    suspend fun cropBitmapImage(
+        bitmap: Bitmap,
+        cropArea: Rect,
+        virtualImageCoordinates: Rect,
+        outputBitmapResolution: Int
+    ): Bitmap {
         val output = withContext(Dispatchers.IO) {
             val w = virtualImageCoordinates.width
             val h = virtualImageCoordinates.height
@@ -154,7 +159,7 @@ object ImageUtils {
             val cropHeight = bitmap.height * cropArea.height / h
             val croppedBitmap = Bitmap.createBitmap(bitmap, startX.toInt(), startY.toInt(), cropWidth.toInt(), cropHeight.toInt())
             Log.i(TAG, "croppedBitmap h=${croppedBitmap.height} w=${croppedBitmap.width}")
-            getCroppedBitmap(croppedBitmap)
+            getCroppedBitmap(croppedBitmap, outputBitmapResolution)
         }
         Log.i(TAG, "croppedBitmap output h=${output.height} w=${output.width}")
         return output

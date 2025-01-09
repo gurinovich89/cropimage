@@ -70,6 +70,7 @@ const val KEY_OUTPUT_CROPPED_BITMAP = "KEY_OUTPUT_CROPPED_BITMAP"
 fun CropImageView(
     bitmap: Bitmap,
     isUseDefaultButtons: Boolean,
+    outputBitmapResolution: Int = OUTPUT_BITMAP_RESOLUTION,
     onCancelCrop: () -> Unit,
     onCroppedImage: (croppedBmp : Bitmap) -> Unit
 ) {
@@ -253,7 +254,7 @@ fun CropImageView(
                                 val cropArea = Rect(cropAreaParams.cropAreaStart, cropAreaParams.cropAreaEnd)
                                 coroutineScope.launch {
                                     val croppedBitmap = withContext(Dispatchers.IO) {
-                                        ImageUtils.cropBitmapImage(bitmap, cropArea = cropArea, virtualImageCoordinates)
+                                        ImageUtils.cropBitmapImage(bitmap, cropArea = cropArea, virtualImageCoordinates, outputBitmapResolution)
                                     }
                                     onCroppedImage(croppedBitmap)
                                 }
