@@ -66,13 +66,20 @@ const val TAG = "CropImageFragment"
 const val REQUEST_KEY_CROP_IMAGE = "REQUEST_KEY_CROP_IMAGE"
 const val KEY_OUTPUT_CROPPED_BITMAP = "KEY_OUTPUT_CROPPED_BITMAP"
 
+interface CropImageButtonPanelListener {
+    fun onCancelClick()
+    fun onCropClick()
+}
+
 @Composable
 fun CropImageView(
     bitmap: Bitmap,
     isUseDefaultButtons: Boolean,
     outputBitmapResolution: Int = OUTPUT_BITMAP_RESOLUTION,
     onCancelCrop: () -> Unit,
-    onCroppedImage: (croppedBmp : Bitmap) -> Unit
+    onCroppedImage: (croppedBmp: Bitmap) -> Unit,
+    /*customButtonPanelContent: (@Composable() (listener: CropImageButtonPanelListener) -> Unit)? = null,
+    customButtonPanelListener: CropImageButtonPanelListener? = null*/
 ) {
     val screenSize = remember { mutableStateOf(IntSize.Zero) }
     Surface(
@@ -205,7 +212,7 @@ fun CropImageView(
                         ))
             }
 
-            if(isUseDefaultButtons) {
+            if (isUseDefaultButtons) {
                 Row(
                     modifier = Modifier
                         .zIndex(1f)

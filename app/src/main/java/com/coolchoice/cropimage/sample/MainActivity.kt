@@ -8,27 +8,37 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.coolchoice.cropimage.CropImageButtonPanelListener
 import com.coolchoice.cropimage.CropImageView
+import com.coolchoice.cropimage.R
 import com.coolchoice.cropimage.TAG
+import com.coolchoice.cropimage.debouncedClickable
 import com.coolchoice.cropimage.sample.ui.theme.CropImageSampleTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -78,13 +88,11 @@ class MainActivity : ComponentActivity() {
                     CropImageView(bitmap = it,
                         isUseDefaultButtons = true,
                         onCancelCrop = { onCancelCrop() },
-                        onCroppedImage = {croppedBmp ->
+                        onCroppedImage = { croppedBmp ->
                             Log.i(TAG, "onCroppedImage croppedBmp size = ${croppedBmp.width} x ${croppedBmp.height}")
                             viewModel.setCroppedImage(croppedBmp)
                         }
-                        /*onConfirmCrop = { bmp: Bitmap, virtualImageCoordinates, cropArea ->
-                            onConfirmCrop(bmp, virtualImageCoordinates, cropArea)
-                        }*/)
+                    )
                 }
 
                 if (BuildConfig.DEBUG) {
@@ -102,7 +110,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             viewModel.loadTestImage(this)
             viewModel.croppedImageEvent.observe(this) { event ->
                 //TODO
@@ -119,6 +127,30 @@ class MainActivity : ComponentActivity() {
     }
 
 
+}
+
+@Composable
+fun CustomCropButtonPanel(listener: CropImageButtonPanelListener) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 100.dp), contentAlignment = Alignment.BottomCenter
+    ) {
+        Image(
+            modifier = Modifier
+                .clip(shape = RoundedCornerShape(percent = 50))
+                .clickable(interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = { })
+                .debouncedClickable {
+                    listener.onCropClick()
+                }
+                .padding(16.dp),
+            painter = painterResource(id = R.drawable.ic_verified_check_32dp),
+            contentDescription = "Close",
+            colorFilter = ColorFilter.tint(color = Color.Red)
+        )
+    }
 }
 
 @Composable
