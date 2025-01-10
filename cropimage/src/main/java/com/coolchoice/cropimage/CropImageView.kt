@@ -3,6 +3,7 @@ package com.coolchoice.cropimage
 import android.graphics.Bitmap
 import android.os.SystemClock
 import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -66,20 +67,25 @@ const val TAG = "CropImageFragment"
 const val REQUEST_KEY_CROP_IMAGE = "REQUEST_KEY_CROP_IMAGE"
 const val KEY_OUTPUT_CROPPED_BITMAP = "KEY_OUTPUT_CROPPED_BITMAP"
 
-interface CropImageButtonPanelListener {
-    fun onCancelClick()
-    fun onCropClick()
+fun interface ICropAreaChangeListener {
+    fun onCropAreaChanged(
+        bitmap: Bitmap,
+        cropArea: Rect,
+        virtualImageCoordinates: Rect,
+        outputBitmapResolution: Int
+    )
 }
 
 @Composable
 fun CropImageView(
     bitmap: Bitmap,
     isUseDefaultButtons: Boolean,
+    @DrawableRes btnCancelIconResId: Int = R.drawable.ic_close_32dp,
+    @DrawableRes btnCropIconResId: Int = R.drawable.ic_verified_check_32dp,
     outputBitmapResolution: Int = OUTPUT_BITMAP_RESOLUTION,
     onCancelCrop: () -> Unit,
     onCroppedImage: (croppedBmp: Bitmap) -> Unit,
-    /*customButtonPanelContent: (@Composable() (listener: CropImageButtonPanelListener) -> Unit)? = null,
-    customButtonPanelListener: CropImageButtonPanelListener? = null*/
+    onCropAreaChanged: ICropAreaChangeListener? = null
 ) {
     val screenSize = remember { mutableStateOf(IntSize.Zero) }
     Surface(
@@ -150,6 +156,19 @@ fun CropImageView(
                         val calcOffsetScale = wrapCropAreaByImage(params)
                         offset.value = calcOffsetScale.offset
                         scale.value = calcOffsetScale.scale
+
+                        onCropAreaChanged?.let {
+                            val cropAreaParams = CropAreaParams(
+                                imageStart = imageStart.value,
+                                imageEnd = imageEnd.value,
+                                imageOffsetScale = OffsetScale(offset = offset.value, scale = scale.value),
+                                cropAreaStart = ovalStart.value,
+                                cropAreaEnd = ovalEnd.value
+                            )
+                            val virtualImageCoordinates = getVirtualImageCoordinates(cropAreaParams)
+                            val cropArea = Rect(cropAreaParams.cropAreaStart, cropAreaParams.cropAreaEnd)
+                            it.onCropAreaChanged(bitmap, cropArea = cropArea, virtualImageCoordinates = virtualImageCoordinates, outputBitmapResolution = outputBitmapResolution)
+                        }
                     })
                 }
         ) {
@@ -203,6 +222,20 @@ fun CropImageView(
                             offset.value = calcOffsetScale.offset
                             scale.value = calcOffsetScale.scale
                             Log.i(TAG, "onGloballyPositioned invoked params=$params")
+
+                            onCropAreaChanged?.let {
+                                val cropAreaParams = CropAreaParams(
+                                    imageStart = imageStart.value,
+                                    imageEnd = imageEnd.value,
+                                    imageOffsetScale = OffsetScale(offset = offset.value, scale = scale.value),
+                                    cropAreaStart = ovalStart.value,
+                                    cropAreaEnd = ovalEnd.value
+                                )
+                                val virtualImageCoordinates = getVirtualImageCoordinates(cropAreaParams)
+                                val cropArea = Rect(cropAreaParams.cropAreaStart, cropAreaParams.cropAreaEnd)
+                                it.onCropAreaChanged(bitmap, cropArea = cropArea, virtualImageCoordinates = virtualImageCoordinates, outputBitmapResolution = outputBitmapResolution)
+                            }
+
                         }
                         .graphicsLayer(
                             scaleX = scaleAnimate,
@@ -235,7 +268,7 @@ fun CropImageView(
                                 onCancelCrop()
                             }
                             .padding(16.dp),
-                        painter = painterResource(id = R.drawable.ic_close_32dp),
+                        painter = painterResource(id = btnCancelIconResId),
                         contentDescription = "Close",
                         colorFilter = ColorFilter.tint(color = Color.White)
                     )
@@ -267,7 +300,7 @@ fun CropImageView(
                                 }
                             }
                             .padding(16.dp),
-                        painter = painterResource(id = R.drawable.ic_verified_check_32dp),
+                        painter = painterResource(id = btnCropIconResId),
                         contentDescription = "Close",
                         colorFilter = ColorFilter.tint(color = Color.White)
                     )
