@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.coolchoice.cropimage.sample"
+    namespace = "io.github.cropimage.sample"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.coolchoice.cropimage.sample"
+        applicationId = "io.github.cropimage.sample"
         minSdk = 21
         targetSdk = 35
         versionCode = 1

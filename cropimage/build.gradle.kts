@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.coolchoice.cropimage"
+    namespace = "io.github.cropimage"
     compileSdk = 34
 
     defaultConfig {
