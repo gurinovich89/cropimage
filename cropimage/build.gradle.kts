@@ -45,7 +45,7 @@ android {
 publishing {
     publications {
         create<MavenPublication>("release") {
-            groupId = "com.coolchoice.cropimage"
+            groupId = "io.github.gurinovich89"
             artifactId = "cropimage"
             version = "1.1.1"
 
