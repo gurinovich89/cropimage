@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    `maven-publish`
 }
 
 android {
@@ -32,6 +33,66 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            groupId = "com.coolchoice.cropimage"
+            artifactId = "cropimage"
+            version = "1.1.1"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+
+            pom {
+                name.set("CropImage")
+                description.set("Composable crop image component. Square crop area is fixed, image is zoomable and shiftable.")
+                url.set("https://github.com/gurinovich89/cropimage")
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("gurinovich89")
+                        name.set("Alex")
+                    }
+                }
+
+                issueManagement {
+                    system.set("GitHub")
+                    uri("https://github.com/gurinovich89/cropimage/issues")
+                }
+
+                scm {
+                    connection = "scm:git:git://github.com/gurinovich89/cropimage.git"
+                    developerConnection = "scm:git:ssh://github.com/gurinovich89/cropimage.git"
+                    url = "https://github.com/gurinovich89/cropimage"
+                }
+            }
+        }
+    }
+
+    repositories {
+        mavenLocal()
+
+        maven {
+            name = "BuildDir"
+            url = uri(rootProject.layout.buildDirectory.dir("maven-repo"))
+        }
     }
 }
 
